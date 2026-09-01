@@ -14,7 +14,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
     setAuthCookies(res, tokens);
 
-    res.status(201).json({ user });
+    return res.status(201).json({ user });
   } catch (error) {
     next(error);
   }
@@ -31,7 +31,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
     setAuthCookies(res, tokens);
 
-    res.status(200).json({ user });
+    return res.status(200).json({ user });
   } catch (error) {
     next(error);
   }
@@ -44,7 +44,7 @@ export async function me(req: Request, res: Response, next: NextFunction) {
       return;
     }
 
-    res.status(200).json({ user: req.user });
+    return res.status(200).json({ user: req.user });
   } catch (error) {
     next(error);
   }
@@ -53,7 +53,7 @@ export async function me(req: Request, res: Response, next: NextFunction) {
 export async function logout(_req: Request, res: Response, next: NextFunction) {
   try {
     clearAuthCookies(res);
-    res.status(200).json({ message: 'Logged out' });
+    return res.status(200).json({ message: 'Logged out' });
   } catch (error) {
     next(error);
   }

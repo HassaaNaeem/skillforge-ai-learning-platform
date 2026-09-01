@@ -1,4 +1,5 @@
-// M2 Challenge 3: create and export an ioredis client using env.REDIS_URL.
-// You implement this file yourself before building anonymous sessions.
+import Redis from 'ioredis';
+import { env } from './env.js';
+export const client = new Redis(env.REDIS_URL);
 
-export {};
+

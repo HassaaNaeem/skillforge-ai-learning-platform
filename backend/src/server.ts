@@ -4,6 +4,7 @@ import express from 'express';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error.js';
 import authRoutes from './modules/auth/routes.js';
+import anonymousRoutes from './modules/anonymous/routes.js';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/anonymous', anonymousRoutes);
 
 app.use(errorHandler);
 
