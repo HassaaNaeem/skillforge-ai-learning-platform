@@ -1,17 +1,28 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
-import { env } from './config/env';
+import { env } from './config/env.js';
+import { errorHandler } from './middleware/error.js';
+import authRoutes from './modules/auth/routes.js';
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: env.NODE_ENV === 'development' ? 'http://localhost:5173' : undefined,
+    credentials: true,
+  }),
+);
 app.use(express.json());
+app.use(cookieParser());
 
-// Placeholder route only, to prove the entrypoint boots end-to-end.
-// Real routes are added module-by-module starting in M2.
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'skillforge-api', env: env.NODE_ENV });
 });
+
+app.use('/auth', authRoutes);
+
+app.use(errorHandler);
 
 app.listen(env.PORT, () => {
   console.log(`[api] listening on http://localhost:${env.PORT}`);
