@@ -16,3 +16,11 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Local-only project / AI docs (keep on disk, not on GitHub)
+AGENTS.md
+docs/
+
+# Prisma CLI agent skills (installed locally by `prisma init`)
+**/.agents/
+**/skills-lock.json

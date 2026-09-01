@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String            @id @default(uuid())
+  name             String
+  email            String            @unique
+  passwordHash     String
+  avatarUrl        String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  practiceSessions PracticeSession[]
+}
+
+model Topic {
+  id               String            @id @default(uuid())
+  name             String
+  slug             String            @unique
+  description      String
+  createdAt        DateTime          @default(now())
+  questions        Question[]
+  practiceSessions PracticeSession[]
+}
+
+model Question {
+  id         String   @id @default(uuid())
+  topicId    String
+  type       String
+  difficulty String
+  prompt     String
+  createdAt  DateTime @default(now())
+  topic      Topic    @relation(fields: [topicId], references: [id])
+  answers    Answer[]
+}
+
+model PracticeSession {
+  id          String    @id @default(uuid())
+  userId      String
+  topicId     String
+  user        User      @relation(fields: [userId], references: [id])
+  topic       Topic     @relation(fields: [topicId], references: [id])
+  mode        String
+  difficulty  String
+  score       Int?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  answers     Answer[]
+}
+
+model Answer {
+  sessionId  String
+  session    PracticeSession @relation(fields: [sessionId], references: [id])
+  questionId String
+  question   Question        @relation(fields: [questionId], references: [id])
+  response   String
+  isCorrect  Boolean
+  score      Int?
+  feedback   String?
+  createdAt  DateTime        @default(now())
+
+  @@id([sessionId, questionId])
+}
