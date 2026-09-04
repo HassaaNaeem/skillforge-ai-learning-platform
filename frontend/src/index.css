@@ -1,17 +1,14 @@
 @import 'tailwindcss';
 
 :root {
-  --sf-bg: #0c1117;
-  --sf-surface: #141b24;
-  --sf-border: #243041;
-  --sf-text: #e8eef6;
-  --sf-muted: #8b9bb0;
-  --sf-accent: #e8a54b;
-  --sf-accent-dim: #c4842f;
-  --sf-danger: #f07178;
-  --sf-ok: #5ecf9a;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+  --bg: #fafafa;
+  --fg: #111111;
+  --muted: #6b6b6b;
+  --line: #e5e5e5;
+  --surface: #ffffff;
+  --danger: #b42318;
+  --font: 'DM Sans', system-ui, sans-serif;
+  --display: 'Syne', system-ui, sans-serif;
 }
 
 html,
@@ -22,8 +19,12 @@ body,
 
 body {
   margin: 0;
-  font-family: var(--font-body);
-  background: var(--sf-bg);
-  color: var(--sf-text);
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
   -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
 }
