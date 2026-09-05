@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchTopics } from './api';
+import { Link } from 'react-router-dom';
 
 export function TopicsList() {
   const { data, isPending, isError, error } = useQuery({
@@ -32,6 +33,7 @@ export function TopicsList() {
           key={topic.id}
           className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] px-5 py-4 shadow-[var(--shadow)] transition-colors hover:border-[#c9d4ea]"
         >
+          <Link to={`/topics/${topic.id}`}>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h3 className="text-base font-semibold tracking-tight text-[var(--fg)]">
@@ -44,7 +46,7 @@ export function TopicsList() {
             <span className="shrink-0 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--accent)]">
               {topic._count?.questions ?? 0} questions
             </span>
-          </div>
+          </div></Link>
         </li>
       ))}
     </ul>

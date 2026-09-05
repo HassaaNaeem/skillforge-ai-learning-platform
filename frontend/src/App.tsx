@@ -4,6 +4,7 @@ import { MarketingLayout } from './components/layout/MarketingLayout';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { TopicsPage } from './pages/TopicsPage';
+import { TopicDetailPage } from './pages/TopicDetailPage';
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="login" element={<LoginPage />} />
           <Route path="topics" element={<TopicsPage />} />
+          <Route path="/topics/:id" element={<TopicDetailPage />}/>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
