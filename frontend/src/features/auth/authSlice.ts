@@ -52,7 +52,7 @@ const authSlice = createSlice({
             state.user = action.payload
             state.status = "success"
         })
-        builder.addCase(fetchMe.rejected, (state, action) => {
+        builder.addCase(fetchMe.rejected, (state) => {
             state.user = null
             state.error = null
             state.status = "idle"
