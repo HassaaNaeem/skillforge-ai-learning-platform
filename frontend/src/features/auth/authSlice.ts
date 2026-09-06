@@ -23,6 +23,14 @@ export const fetchMe = createAsyncThunk(
     },
   )
 
+export const register = createAsyncThunk(
+    'auth/register',
+    async (input: { name: string; email: string; password: string }) => {
+      const response = await api.post(`/auth/register`, input)
+      return response.data.user
+    },
+  )
+
 export const login = createAsyncThunk(
     'auth/login',
     async (credentials: { email: string, password: string }) => {
@@ -57,8 +65,22 @@ const authSlice = createSlice({
             state.error = null
             state.status = "idle"
         })
+        builder.addCase(register.pending, (state) => {
+            state.status = "loading"
+            state.error = null
+        })
+        builder.addCase(register.fulfilled, (state, action) => {
+            state.user = action.payload
+            state.status = "success"
+            state.error = null
+        })
+        builder.addCase(register.rejected, (state, action) => {
+            state.error = action.error.message ?? null
+            state.status = "error"
+        })
         builder.addCase(login.pending, (state) => {
             state.status = "loading"
+            state.error = null
         })
         builder.addCase(login.fulfilled, (state, action) => {
             state.user = action.payload

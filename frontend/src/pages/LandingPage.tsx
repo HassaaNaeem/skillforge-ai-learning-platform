@@ -1,4 +1,14 @@
 import { ButtonLink } from '../components/ui/Button';
+import { TopicIcon } from '../components/TopicIcon';
+
+const TRACKS = [
+  { slug: 'javascript', name: 'JavaScript' },
+  { slug: 'typescript', name: 'TypeScript' },
+  { slug: 'react', name: 'React' },
+  { slug: 'nodejs', name: 'Node.js' },
+  { slug: 'postgresql', name: 'PostgreSQL' },
+  { slug: 'git', name: 'Git' },
+] as const;
 
 function ProductMock() {
   return (
@@ -17,7 +27,10 @@ function ProductMock() {
       <div className="grid gap-0 md:grid-cols-[200px_1fr]">
         <aside className="hidden border-r border-[var(--line)] bg-[var(--bg)] p-4 md:block">
           <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">Topic</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--fg)]">React</p>
+          <div className="mt-2 flex items-center gap-2">
+            <TopicIcon slug="react" name="React" size="sm" />
+            <p className="text-sm font-semibold text-[var(--fg)]">React</p>
+          </div>
           <p className="mt-4 text-xs text-[var(--muted)]">Question 2 of 8</p>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--line)]">
             <div className="h-full w-1/4 rounded-full bg-[var(--accent)]" />
@@ -36,7 +49,7 @@ function ProductMock() {
             When two components share the same setup logic…
           </div>
           <div className="mt-4 flex justify-end">
-            <span className="rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white">
+            <span className="sf-btn-primary rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white">
               Submit answer
             </span>
           </div>
@@ -57,13 +70,18 @@ export function LandingPage() {
               Practice interviews that build real skill.
             </h1>
             <p className="mt-4 max-w-lg text-base leading-relaxed text-[var(--muted)]">
-              Work through topic-based questions, run timed practice sessions, and keep a history
-              of what you actually improve—not another generic quiz dump.
+              SkillForge is a workspace for written interview answers. You pick a track—JavaScript,
+              TypeScript, React, Node, SQL, Git—then write the same kind of explanation you would
+              give a hiring manager. Not flashcards. Not a leaderboard of trivia.
+            </p>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
+              Guests can run a full session in the browser. Create an account when you want history
+              across days.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink to="/topics">Browse topics</ButtonLink>
-              <ButtonLink to="/login" variant="secondary">
-                Sign in
+              <ButtonLink to="/register" variant="secondary">
+                Create account
               </ButtonLink>
             </div>
           </div>
@@ -71,30 +89,51 @@ export function LandingPage() {
         </div>
       </section>
 
+      <section className="border-b border-[var(--line)] bg-[var(--bg)]">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <p className="text-sm font-medium text-[var(--muted)]">Tracks you can start today</p>
+          <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {TRACKS.map((track) => (
+              <li
+                key={track.slug}
+                className="flex items-center gap-2.5 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3 shadow-[var(--shadow)]"
+              >
+                <TopicIcon slug={track.slug} name={track.name} size="sm" />
+                <span className="text-sm font-medium text-[var(--fg)]">{track.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <h2 className="text-2xl font-semibold tracking-tight text-[var(--fg)]">
           Built for how developers actually prepare
         </h2>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--muted)]">
-          SkillForge is a practice workspace, not a content dump.
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+          Most “interview apps” show you the answer key. SkillForge hides the list, asks you to
+          write, and stores the attempt. That is closer to a real loop: think, explain, review later.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
-            <p className="text-sm font-semibold text-[var(--fg)]">Topics</p>
+            <p className="text-sm font-semibold text-[var(--fg)]">Focused tracks</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Curated JavaScript, React, Node, and more—each with questions at a clear difficulty.
+              Six starter topics with easy, medium, and hard prompts. Each one is scoped so a
+              session fits in a commute or a lunch break.
             </p>
           </article>
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
-            <p className="text-sm font-semibold text-[var(--fg)]">Practice sessions</p>
+            <p className="text-sm font-semibold text-[var(--fg)]">Written answers</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Start as a guest or signed-in user. Answers persist for the path you chose.
+              You type like you are pairing. We save the text now. Structured AI scoring is a later
+              milestone—your practice still counts today.
             </p>
           </article>
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
-            <p className="text-sm font-semibold text-[var(--fg)]">Feedback and history</p>
+            <p className="text-sm font-semibold text-[var(--fg)]">Guest or account</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              See gaps across sessions so the next hour of practice is deliberate.
+              Anonymous sessions live in Redis for a limited time. Signed-in sessions live in
+              Postgres so you can refresh and continue.
             </p>
           </article>
         </div>
@@ -104,28 +143,31 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--fg)]">How it works</h2>
           <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
-            Three steps from topic to feedback.
+            Three steps. No question dump before you commit to a session.
           </p>
           <ol className="mt-10 grid gap-4 md:grid-cols-3">
             <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-5">
               <p className="text-xs font-semibold text-[var(--accent)]">01</p>
-              <p className="mt-2 font-semibold text-[var(--fg)]">Pick a topic</p>
+              <p className="mt-2 font-semibold text-[var(--fg)]">Pick a track and difficulty</p>
               <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-                Choose a track and difficulty. Questions stay scoped to that session.
+                Open JavaScript, React, or another track. Choose easy, medium, or hard. You see
+                what the track is about—not the prompts.
               </p>
             </li>
             <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-5">
               <p className="text-xs font-semibold text-[var(--accent)]">02</p>
               <p className="mt-2 font-semibold text-[var(--fg)]">Write your answer</p>
               <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-                Practice like an interview: explain tradeoffs, not just the happy path.
+                One question at a time. Explain tradeoffs the way you would on a call, then submit
+                and move on.
               </p>
             </li>
             <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-5">
               <p className="text-xs font-semibold text-[var(--accent)]">03</p>
-              <p className="mt-2 font-semibold text-[var(--fg)]">Review and repeat</p>
+              <p className="mt-2 font-semibold text-[var(--fg)]">Keep the session</p>
               <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-                Keep history when you sign in. Guests can still run a full session.
+                Guests keep the tab. Accounts can refresh the URL. Feedback and dashboards come
+                next on the roadmap.
               </p>
             </li>
           </ol>
@@ -137,8 +179,9 @@ export function LandingPage() {
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--fg)]">
             Ready to practice?
           </h2>
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--muted)]">
-            Browse topics now, or sign in to keep your session history.
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
+            Open the track list, pick something you have used at work, and write one honest answer.
+            That is more useful than rereading notes.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <ButtonLink to="/topics">View topics</ButtonLink>

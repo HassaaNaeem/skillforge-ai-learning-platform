@@ -4,6 +4,9 @@ import { Button } from '../components/ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAnonymousSession, getPracticeSession, submitAnonymousAnswer, submitPracticeAnswer } from '../features/practice/api';
 import { getTopic } from '../features/topics/api';
+import { getApiErrorMessage } from '../lib/apiError';
+import { TopicIcon } from '../components/TopicIcon';
+import { getTopicBlurb } from '../lib/topicCopy';
 
 
 
@@ -53,7 +56,10 @@ export function PracticeSessionPage() {
   })
 
   const topicName = topicQuery.data?.name
-  const questions = topicQuery.data?.questions ?? [];
+  const sessionDifficulty = anonQuery.data?.difficulty ?? practiceQuery.data?.difficulty
+  const questions = (topicQuery.data?.questions ?? []).filter(
+    (q) => !sessionDifficulty || q.difficulty === sessionDifficulty,
+  );
   const answeredIds = new Set(
     [
       ...(anonQuery.data?.answers ?? []),
@@ -122,13 +128,19 @@ export function PracticeSessionPage() {
       </Link>
 
       <header className="mt-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-[var(--accent)]">
-            {isAnonymous ? 'Guest session' : 'Practice session'}
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[var(--fg)]">
-            {topicName}
-          </h1>
+        <div className="flex items-start gap-3">
+          <TopicIcon slug={topicQuery.data?.slug} name={topicName} />
+          <div>
+            <p className="text-sm font-medium text-[var(--accent)]">
+              {isAnonymous ? 'Guest session' : 'Practice session'}
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[var(--fg)]">
+              {topicName}
+            </h1>
+            <p className="mt-1 max-w-md text-sm text-[var(--muted)]">
+              {getTopicBlurb(topicQuery.data?.slug, topicName).summary}
+            </p>
+          </div>
         </div>
         <p className="text-sm text-[var(--muted)]">{progressLabel}</p>
       </header>
@@ -149,7 +161,12 @@ export function PracticeSessionPage() {
           </span>
           <span className="text-xs text-[var(--muted)]">{question.type}</span>
         </div>
-        <p className="mt-4 text-base font-semibold leading-relaxed text-[var(--fg)]">
+        <p
+          className="mt-4 select-none text-base font-semibold leading-relaxed text-[var(--fg)]"
+          onCopy={(e) => e.preventDefault()}
+          onCut={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
+        >
           {question.prompt}
         </p>
 
@@ -158,6 +175,8 @@ export function PracticeSessionPage() {
           <textarea
             value={response}
             onChange={(e) => setResponse(e.target.value)}
+            onPaste={(e) => e.preventDefault()}
+            onDrop={(e) => e.preventDefault()}
             disabled={answered || submitPending}
             rows={8}
             className="w-full resize-y rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] px-3.5 py-3 text-sm text-[var(--fg)] outline-none focus:border-[var(--accent)] focus:shadow-[0_0_0_3px_var(--accent-soft)] disabled:opacity-60"
@@ -167,6 +186,12 @@ export function PracticeSessionPage() {
 
         {answered ? (
           <p className="mt-3 text-sm text-[var(--muted)]">Already submitted for this question.</p>
+        ) : null}
+
+        {submitMutation.isError ? (
+          <p role="alert" className="mt-3 text-sm text-[var(--danger)]">
+            {getApiErrorMessage(submitMutation.error, 'Could not submit answer')}
+          </p>
         ) : null}
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">

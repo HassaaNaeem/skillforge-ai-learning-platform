@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { login } from '../features/auth/authSlice';
+import { register } from '../features/auth/authSlice';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { PageHeader } from '../components/ui/PageHeader';
 
-export function LoginPage() {
+export function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
@@ -20,8 +21,8 @@ export function LoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const result = await dispatch(login({ email, password }));
-    if (login.fulfilled.match(result)) {
+    const result = await dispatch(register({ name, email, password }));
+    if (register.fulfilled.match(result)) {
       navigate('/topics');
     }
   }
@@ -29,14 +30,24 @@ export function LoginPage() {
   return (
     <div className="mx-auto max-w-md">
       <PageHeader
-        title="Sign in"
-        description="Signed-in sessions are stored in your account so you can refresh a practice URL and come back later. Guests can still start a track without this step."
+        title="Create an account"
+        description="Save practice history and pick up sessions later."
       />
 
       <form
         onSubmit={handleSubmit}
         className="space-y-5 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow)]"
       >
+        <Input
+          label="Name"
+          type="text"
+          name="name"
+          autoComplete="name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={isLoading}
+        />
         <Input
           label="Email"
           type="email"
@@ -51,8 +62,9 @@ export function LoginPage() {
           label="Password"
           type="password"
           name="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isLoading}
@@ -65,18 +77,14 @@ export function LoginPage() {
         ) : null}
 
         <Button type="submit" variant="primary" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Signing in…' : 'Sign in'}
+          {isLoading ? 'Creating account…' : 'Create account'}
         </Button>
       </form>
 
       <p className="mt-5 text-sm text-[var(--muted)]">
-        No account?{' '}
-        <Link to="/register" className="font-medium text-[var(--accent)] hover:text-[var(--accent-hover)]">
-          Create one
-        </Link>
-        {' · '}
-        <Link to="/topics" className="font-medium text-[var(--accent)] hover:text-[var(--accent-hover)]">
-          View topics
+        Already have an account?{' '}
+        <Link to="/login" className="font-medium text-[var(--accent)] hover:text-[var(--accent-hover)]">
+          Sign in
         </Link>
       </p>
     </div>
