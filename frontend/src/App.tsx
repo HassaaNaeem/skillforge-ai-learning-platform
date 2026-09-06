@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { TopicsPage } from './pages/TopicsPage';
 import { TopicDetailPage } from './pages/TopicDetailPage';
+import { PracticeSessionPage } from './pages/PracticeSessionPage';
 
 export default function App() {
   return (
@@ -16,7 +17,9 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="login" element={<LoginPage />} />
           <Route path="topics" element={<TopicsPage />} />
-          <Route path="/topics/:id" element={<TopicDetailPage />}/>
+          <Route path="topics/:id" element={<TopicDetailPage />} />
+          <Route path="practice/sessions/:sessionId" element={<PracticeSessionPage />} />
+          <Route path="anonymous/sessions/:sessionId" element={<PracticeSessionPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

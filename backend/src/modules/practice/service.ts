@@ -19,6 +19,18 @@ export async function createPracticeSession(userId: string, topicId: string, mod
     return practiceSession
 }
 
+export async function getPracticeSession(sessionId: string, userId: string) {
+    const practiceSession = await prisma.practiceSession.findUnique({
+        where: { id: sessionId },
+        include: { answers: true },
+    })
+    if (!practiceSession) throw new AppError(404, "Practice session not found")
+    if (practiceSession.userId !== userId) {
+        throw new AppError(403, "You are not authorized to view this practice session")
+    }
+    return practiceSession
+}
+
 export async function submitAnswer(practiceSessionId: string, questionId: string, response: string, userId: string){
     const practiceSession = await prisma.practiceSession.findUnique({
         where: {

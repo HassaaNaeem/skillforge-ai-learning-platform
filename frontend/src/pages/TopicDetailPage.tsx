@@ -1,8 +1,10 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import type { Question } from '../types/topic';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getTopic } from '../features/topics/api';
+import { useAppSelector } from '../store/hooks';
+import { createAnonymousSession, createPracticeSession } from '../features/practice/api';
 
 const DIFFICULTY_CLASS: Record<string, string> = {
   easy: 'bg-[#ecfdf3] text-[#027a48]',
@@ -36,11 +38,22 @@ function QuestionRow({ question }: { question: Question }) {
 
 export function TopicDetailPage() {
   const {id} = useParams<{id:string}>()
+  const navigate = useNavigate()
+
+  const {user} = useAppSelector(state => state.auth)
 
   const {data, isPending, isError, error} = useQuery({
     queryKey: ['topics', id],
     queryFn: () => getTopic(id!),
     enabled: !!id
+  })
+
+  const startSessionMutation = useMutation({
+    mutationFn: (topicId: string) => user ? createPracticeSession(topicId, 'practice', 'easy') : createAnonymousSession(topicId, 'practice', 'easy'),
+    onSuccess: (data) =>
+      navigate(`/${user ? 'practice' : 'anonymous'}/sessions/${data.id}`, {
+        state: { topicId: id },
+      }),
   })
 
   if (!id){
@@ -109,8 +122,8 @@ export function TopicDetailPage() {
             {questions.length} questions
           </span>
           {/* TODO later (not Challenge 4): start a practice session */}
-          <Button type="button" disabled>
-            Start practice
+          <Button type="button" onClick={() => startSessionMutation.mutate(id!)} disabled={startSessionMutation.isPending || !id}>
+            {startSessionMutation.isPending ? 'Starting...' : 'Start practice'}
           </Button>
         </div>
       </header>

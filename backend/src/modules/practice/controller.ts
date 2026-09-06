@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { createPracticeSession, submitAnswer } from "./service.js"
+import { createPracticeSession, getPracticeSession, submitAnswer } from "./service.js"
 import { AppError } from "../../utils/AppError.js"
 import { AnswerInput } from "./schema.js"
 
@@ -12,6 +12,18 @@ export async function createPracticeSessionController(req: Request, res: Respons
     } catch (error) {
         next(error)
     }   
+}
+
+export async function getPracticeSessionController(req: Request, res: Response, next: NextFunction) {
+    try {
+        if (!req.user) throw new AppError(401, "Unauthorized")
+        const sessionId = req.params.sessionId
+        if (!sessionId) throw new AppError(400, "Session ID is required")
+        const practiceSession = await getPracticeSession(sessionId, req.user.id)
+        res.status(200).json({ practiceSession })
+    } catch (error) {
+        next(error)
+    }
 }
 
 export async function submitAnswerController(req: Request, res: Response, next: NextFunction) {
