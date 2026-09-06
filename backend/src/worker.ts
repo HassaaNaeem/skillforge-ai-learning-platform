@@ -1,5 +1,23 @@
-import { env } from './config/env';
+import { Worker } from 'bullmq';
+import { env } from './config/env.js';
+import { bullmqConnection } from './config/bullmq.js';
+import { EVALUATE_QUEUE } from './jobs/evaluateAnswer.js';
+import { processEvaluateAnswer } from './jobs/processEvaluateAnswer.js';
 
-// Placeholder entrypoint only. Real BullMQ processors (reading from Redis,
-// calling the AI provider, writing results back) are built in M6/M7.
-console.log(`[worker] placeholder entrypoint booted (env: ${env.NODE_ENV})`);
+const worker = new Worker(
+  EVALUATE_QUEUE,
+  async (job) => {
+    await processEvaluateAnswer(job.data);
+  },
+  { connection: bullmqConnection },
+);
+
+worker.on('completed', (job) => {
+  console.log(`[worker] completed ${job.name} ${job.id}`);
+});
+
+worker.on('failed', (job, error) => {
+  console.error(`[worker] failed ${job?.id}`, error);
+});
+
+console.log(`[worker] listening on queue "${EVALUATE_QUEUE}" (env: ${env.NODE_ENV})`);
