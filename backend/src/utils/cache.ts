@@ -1,6 +1,5 @@
 import { client } from '../config/redis.js';
 
-/** Catalog data (topics/questions) — 10 minutes is enough; seed rarely changes. */
 export const CATALOG_TTL_SECONDS = 60 * 10;
 
 export function topicsListKey() {
