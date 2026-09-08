@@ -1,7 +1,7 @@
-export const EVALUATE_QUEUE = 'evaluate-answer';
+export const queueName = "evaluate-answer"
 
 export type EvaluateAnswerJob = {
-  kind: 'auth' | 'anon';
-  sessionId: string;
-  questionId: string;
-};
+    kind: "auth" | "anon"
+    sessionId: string
+    questionId: string
+}

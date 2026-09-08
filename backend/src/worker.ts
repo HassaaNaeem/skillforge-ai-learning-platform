@@ -1,23 +1,20 @@
 import { Worker } from 'bullmq';
-import { env } from './config/env.js';
-import { bullmqConnection } from './config/bullmq.js';
-import { EVALUATE_QUEUE } from './jobs/evaluateAnswer.js';
+import { type EvaluateAnswerJob, queueName } from './jobs/evaluateAnswer.js';
+import { connection } from './config/bullmq.js';
 import { processEvaluateAnswer } from './jobs/processEvaluateAnswer.js';
 
-const worker = new Worker(
-  EVALUATE_QUEUE,
+const worker = new Worker<EvaluateAnswerJob>(
+  queueName,
   async (job) => {
     await processEvaluateAnswer(job.data);
   },
-  { connection: bullmqConnection },
+  { connection },
 );
 
 worker.on('completed', (job) => {
-  console.log(`[worker] completed ${job.name} ${job.id}`);
+  console.log(`Job ${job.id} completed successfully!`);
 });
 
-worker.on('failed', (job, error) => {
-  console.error(`[worker] failed ${job?.id}`, error);
+worker.on('failed', (job, err) => {
+  console.log(`Job ${job?.id} failed with error:`, err.message);
 });
-
-console.log(`[worker] listening on queue "${EVALUATE_QUEUE}" (env: ${env.NODE_ENV})`);
