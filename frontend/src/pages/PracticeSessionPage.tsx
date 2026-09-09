@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getAnonymousSession, getPracticeSession, submitAnonymousAnswer, submitPracticeAnswer } from '../features/practice/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  getAnonymousSession,
+  getPracticeSession,
+  submitAnonymousAnswer,
+  submitPracticeAnswer,
+} from '../features/practice/api';
 import { getTopic } from '../features/topics/api';
 import { getApiErrorMessage } from '../lib/apiError';
 import { TopicIcon } from '../components/TopicIcon';
 import { getTopicBlurb } from '../lib/topicCopy';
-
-
 
 const DIFFICULTY_CLASS: Record<string, string> = {
   easy: 'bg-[#ecfdf3] text-[#027a48]',
@@ -16,6 +19,13 @@ const DIFFICULTY_CLASS: Record<string, string> = {
   hard: 'bg-[#fef3f2] text-[#b42318]',
 };
 
+type SessionAnswer = {
+  questionId: string;
+  response: string;
+  feedback?: string | null;
+  score?: number | null;
+  isCorrect?: boolean | null;
+};
 
 export function PracticeSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -25,57 +35,70 @@ export function PracticeSessionPage() {
 
   const [index, setIndex] = useState(0);
   const [response, setResponse] = useState('');
-    
+
+  const queryClient = useQueryClient();
+
   const anonQuery = useQuery({
     queryKey: ['anonymous-session', sessionId],
     queryFn: () => getAnonymousSession(sessionId!),
     enabled: isAnonymous && !!sessionId,
-  })
+    refetchInterval: (query) => {
+      const answers = query.state.data?.answers as { feedback?: string | null }[] | undefined;
+      const waiting = answers?.some((a) => !a.feedback);
+      return waiting ? 2000 : false;
+    },
+  });
 
   const practiceQuery = useQuery({
     queryKey: ['practice-session', sessionId],
     queryFn: () => getPracticeSession(sessionId!),
     enabled: !isAnonymous && !!sessionId,
-  })
+    refetchInterval: (query) => {
+      const answers = query.state.data?.answers as { feedback?: string | null }[] | undefined;
+      const waiting = answers?.some((a) => !a.feedback);
+      return waiting ? 2000 : false;
+    },
+  });
 
-  const topicId =
-    anonQuery.data?.topicId ?? practiceQuery.data?.topicId ?? topicIdFromState
+  const topicId = anonQuery.data?.topicId ?? practiceQuery.data?.topicId ?? topicIdFromState;
 
   const topicQuery = useQuery({
     queryKey: ['topics', topicId],
     queryFn: () => getTopic(topicId!),
     enabled: !!topicId,
-  })
+  });
 
   const submitMutation = useMutation({
-    mutationFn: ({questionId, response}: { questionId: string, response: string }) => isAnonymous ? submitAnonymousAnswer(sessionId!, questionId, response) : submitPracticeAnswer(sessionId!, questionId, response),
+    mutationFn: ({ questionId, response }: { questionId: string; response: string }) =>
+      isAnonymous
+        ? submitAnonymousAnswer(sessionId!, questionId, response)
+        : submitPracticeAnswer(sessionId!, questionId, response),
     onSuccess: () => {
-      setResponse("")
-      setIndex((i) => Math.min(i+1, questions.length - 1))
+      setResponse('');
+      void queryClient.invalidateQueries({
+        queryKey: isAnonymous ? ['anonymous-session', sessionId] : ['practice-session', sessionId],
+      });
     },
-  })
+  });
 
-  const topicName = topicQuery.data?.name
-  const sessionDifficulty = anonQuery.data?.difficulty ?? practiceQuery.data?.difficulty
+  const topicName = topicQuery.data?.name;
+  const sessionDifficulty = anonQuery.data?.difficulty ?? practiceQuery.data?.difficulty;
   const questions = (topicQuery.data?.questions ?? []).filter(
     (q) => !sessionDifficulty || q.difficulty === sessionDifficulty,
   );
   const answeredIds = new Set(
-    [
-      ...(anonQuery.data?.answers ?? []),
-      ...(practiceQuery.data?.answers ?? []),
-    ].map((answer: { questionId: string }) => answer.questionId),
-  )
-  const submitPending = submitMutation.isPending
+    [...(anonQuery.data?.answers ?? []), ...(practiceQuery.data?.answers ?? [])].map(
+      (answer: { questionId: string }) => answer.questionId,
+    ),
+  );
 
+  const submitPending = submitMutation.isPending;
 
   const isPending =
     (isAnonymous && anonQuery.isPending) ||
     (!isAnonymous && practiceQuery.isPending) ||
-    topicQuery.isPending
-  const isError = anonQuery.isError || practiceQuery.isError || topicQuery.isError
-
-  
+    topicQuery.isPending;
+  const isError = anonQuery.isError || practiceQuery.isError || topicQuery.isError;
 
   const question = questions[index];
   const progressLabel = useMemo(() => {
@@ -85,9 +108,18 @@ export function PracticeSessionPage() {
 
   const answered = question ? answeredIds.has(question.id) : false;
 
+  const sessionAnswers: SessionAnswer[] = [
+    ...((anonQuery.data?.answers ?? []) as SessionAnswer[]),
+    ...((practiceQuery.data?.answers ?? []) as SessionAnswer[]),
+  ];
+
+  const currentAnswer = question
+    ? sessionAnswers.find((a) => a.questionId === question.id)
+    : undefined;
+
   function handleSubmit() {
     if (!sessionId || !question || !response.trim()) return;
-    submitMutation.mutate({ questionId: question.id, response })
+    submitMutation.mutate({ questionId: question.id, response });
   }
 
   if (!sessionId) {
@@ -173,7 +205,7 @@ export function PracticeSessionPage() {
         <label className="mt-6 block">
           <span className="mb-1.5 block text-sm font-medium text-[var(--fg)]">Your answer</span>
           <textarea
-            value={response}
+            value={answered ? (currentAnswer?.response ?? '') : response}
             onChange={(e) => setResponse(e.target.value)}
             onPaste={(e) => e.preventDefault()}
             onDrop={(e) => e.preventDefault()}
@@ -185,7 +217,32 @@ export function PracticeSessionPage() {
         </label>
 
         {answered ? (
-          <p className="mt-3 text-sm text-[var(--muted)]">Already submitted for this question.</p>
+          <div className="mt-4 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-4">
+            {currentAnswer?.feedback ? (
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-medium text-[var(--fg)]">AI feedback</p>
+                  {typeof currentAnswer.score === 'number' ? (
+                    <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-xs font-medium text-[var(--accent)]">
+                      Score {currentAnswer.score}
+                    </span>
+                  ) : null}
+                  {currentAnswer.isCorrect === true ? (
+                    <span className="rounded-full bg-[#ecfdf3] px-2 py-0.5 text-xs font-medium text-[#027a48]">
+                      Pass
+                    </span>
+                  ) : currentAnswer.isCorrect === false ? (
+                    <span className="rounded-full bg-[#fef3f2] px-2 py-0.5 text-xs font-medium text-[#b42318]">
+                      Needs work
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{currentAnswer.feedback}</p>
+              </>
+            ) : (
+              <p className="text-sm text-[var(--muted)]">Evaluating your answer…</p>
+            )}
+          </div>
         ) : null}
 
         {submitMutation.isError ? (

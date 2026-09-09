@@ -12,7 +12,7 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(1),
   JWT_REFRESH_SECRET: z.string().min(1),
   REDIS_URL: z.string().min(1),
-  API_KEY: z.string().min(1),
+  GEMINI_API_KEY: z.string().min(1),
 });
 
 export const env = envSchema.parse(process.env);

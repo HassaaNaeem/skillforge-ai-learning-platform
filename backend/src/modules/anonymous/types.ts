@@ -3,6 +3,7 @@ export type AnonymousAnswer = {
   response: string;
   feedback?: string;
   score?: number;
+  isCorrect?: boolean;
 };
 
 export type AnonymousSession = {
