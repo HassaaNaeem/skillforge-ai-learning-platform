@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import { getTopic } from '../features/topics/api';
 import { getApiErrorMessage } from '../lib/apiError';
 import { TopicIcon } from '../components/TopicIcon';
 import { getTopicBlurb } from '../lib/topicCopy';
+import { getSocket } from '../lib/socket';
 
 const DIFFICULTY_CLASS: Record<string, string> = {
   easy: 'bg-[#ecfdf3] text-[#027a48]',
@@ -37,27 +38,35 @@ export function PracticeSessionPage() {
   const [response, setResponse] = useState('');
 
   const queryClient = useQueryClient();
+  const sessionQueryKey = isAnonymous
+    ? (['anonymous-session', sessionId] as const)
+    : (['practice-session', sessionId] as const);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    const socket = getSocket();
+    const onReady = (payload: { sessionId?: string }) => {
+      if (payload.sessionId !== sessionId) return;
+      void queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+    };
+    socket.emit('join-session', sessionId);
+    socket.on('evaluation:ready', onReady);
+    return () => {
+      socket.emit('leave-session', sessionId);
+      socket.off('evaluation:ready', onReady);
+    };
+  }, [sessionId, queryClient, sessionQueryKey]);
 
   const anonQuery = useQuery({
     queryKey: ['anonymous-session', sessionId],
     queryFn: () => getAnonymousSession(sessionId!),
     enabled: isAnonymous && !!sessionId,
-    refetchInterval: (query) => {
-      const answers = query.state.data?.answers as { feedback?: string | null }[] | undefined;
-      const waiting = answers?.some((a) => !a.feedback);
-      return waiting ? 2000 : false;
-    },
   });
 
   const practiceQuery = useQuery({
     queryKey: ['practice-session', sessionId],
     queryFn: () => getPracticeSession(sessionId!),
     enabled: !isAnonymous && !!sessionId,
-    refetchInterval: (query) => {
-      const answers = query.state.data?.answers as { feedback?: string | null }[] | undefined;
-      const waiting = answers?.some((a) => !a.feedback);
-      return waiting ? 2000 : false;
-    },
   });
 
   const topicId = anonQuery.data?.topicId ?? practiceQuery.data?.topicId ?? topicIdFromState;
@@ -75,9 +84,7 @@ export function PracticeSessionPage() {
         : submitPracticeAnswer(sessionId!, questionId, response),
     onSuccess: () => {
       setResponse('');
-      void queryClient.invalidateQueries({
-        queryKey: isAnonymous ? ['anonymous-session', sessionId] : ['practice-session', sessionId],
-      });
+      void queryClient.invalidateQueries({ queryKey: sessionQueryKey });
     },
   });
 

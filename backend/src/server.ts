@@ -1,3 +1,4 @@
+import { createServer } from 'node:http';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -8,7 +9,7 @@ import anonymousRoutes from './modules/anonymous/routes.js';
 import topicsRoutes from './modules/topics/routes.js';
 import questionsRoutes from './modules/questions/routes.js';
 import practiceRoutes from './modules/practice/routes.js';
-
+import { attachSockets } from './sockets/index.js';
 
 const app = express();
 
@@ -28,11 +29,14 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/anonymous', anonymousRoutes);
 app.use('/topics', topicsRoutes);
-app.use("/questions", questionsRoutes);
-app.use("/practice", practiceRoutes);
+app.use('/questions', questionsRoutes);
+app.use('/practice', practiceRoutes);
 
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
+const httpServer = createServer(app);
+attachSockets(httpServer);
+
+httpServer.listen(env.PORT, () => {
   console.log(`[api] listening on http://localhost:${env.PORT}`);
 });

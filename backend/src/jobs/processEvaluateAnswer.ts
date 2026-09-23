@@ -2,6 +2,7 @@ import { prisma } from '../config/db.js';
 import { client } from '../config/redis.js';
 import { evaluateAnswerWithAi } from '../lib/evaluateAnswer.js';
 import { getSession } from '../modules/anonymous/service.js';
+import { publishEvaluationReady } from '../sockets/publish.js';
 import type { EvaluateAnswerJob } from './evaluateAnswer.js';
 
 export async function processEvaluateAnswer(job: EvaluateAnswerJob) {
@@ -34,6 +35,7 @@ export async function processEvaluateAnswer(job: EvaluateAnswerJob) {
       },
       data: { feedback, score, isCorrect },
     });
+    await publishEvaluationReady({ sessionId: job.sessionId, questionId: job.questionId });
   } else if (job.kind === 'anon') {
     const session = await getSession(job.sessionId);
     if (!session) return;
@@ -57,5 +59,6 @@ export async function processEvaluateAnswer(job: EvaluateAnswerJob) {
     existingAnswer.isCorrect = isCorrect;
 
     await client.set(`anon:session:${session.id}`, JSON.stringify(session), 'EX', 60 * 45);
+    await publishEvaluationReady({ sessionId: job.sessionId, questionId: job.questionId });
   }
 }
