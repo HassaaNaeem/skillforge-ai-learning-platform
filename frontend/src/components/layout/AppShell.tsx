@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMe } from '../../features/auth/authSlice';
 import { AuthActions } from './AuthActions';
 import { BrandMark } from './BrandMark';
@@ -10,6 +10,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function AppShell() {
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(fetchMe());
@@ -25,6 +26,11 @@ export function AppShell() {
               <NavLink to="/topics" className={navLinkClass}>
                 Topics
               </NavLink>
+              {user ? (
+                <NavLink to="/profile" className={navLinkClass}>
+                  Profile
+                </NavLink>
+              ) : null}
             </nav>
           </div>
           <AuthActions primaryTo="/login" primaryLabel="Sign in" showSignInLink={false} />

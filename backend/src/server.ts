@@ -9,6 +9,7 @@ import anonymousRoutes from './modules/anonymous/routes.js';
 import topicsRoutes from './modules/topics/routes.js';
 import questionsRoutes from './modules/questions/routes.js';
 import practiceRoutes from './modules/practice/routes.js';
+import usersRoutes from './modules/users/routes.js';
 import { attachSockets } from './sockets/index.js';
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/anonymous', anonymousRoutes);
 app.use('/topics', topicsRoutes);
 app.use('/questions', questionsRoutes);
 app.use('/practice', practiceRoutes);
+app.use('/users', usersRoutes);
 
 app.use(errorHandler);
 

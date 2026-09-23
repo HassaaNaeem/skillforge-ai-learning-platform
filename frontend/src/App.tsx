@@ -7,6 +7,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { TopicsPage } from './pages/TopicsPage';
 import { TopicDetailPage } from './pages/TopicDetailPage';
 import { PracticeSessionPage } from './pages/PracticeSessionPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="topics" element={<TopicsPage />} />
           <Route path="topics/:id" element={<TopicDetailPage />} />
           <Route path="practice/sessions/:sessionId" element={<PracticeSessionPage />} />

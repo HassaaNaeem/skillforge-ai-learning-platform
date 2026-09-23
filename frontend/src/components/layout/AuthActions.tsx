@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../features/auth/authSlice';
 import { Button, ButtonLink } from '../ui/Button';
@@ -20,7 +21,20 @@ export function AuthActions({
   if (user) {
     return (
       <div className="flex items-center gap-3">
-        <span className="hidden text-sm text-[var(--muted)] sm:inline">{user.name}</span>
+        <Link to="/profile" className="flex items-center gap-2">
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt=""
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-semibold text-[var(--accent)]">
+              {user.name.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <span className="hidden text-sm text-[var(--muted)] sm:inline">{user.name}</span>
+        </Link>
         <Button variant="secondary" onClick={() => dispatch(logout())} disabled={isLoading}>
           {isLoading ? '…' : 'Log out'}
         </Button>

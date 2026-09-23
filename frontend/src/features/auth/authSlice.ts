@@ -1,16 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../lib/api";
+import { getApiErrorMessage } from "../../lib/apiError";
+import { uploadAvatar as uploadAvatarRequest } from "../users/api";
 import type { User } from "../../types/auth";
 
 export interface AuthState {
     user: User | null,
     status: "idle" | "loading" | "success" | "error",
-    error: string | null 
+    error: string | null,
+    initialized: boolean,
 }
 const initialState: AuthState = {
     user: null,
     status: "idle",
     error: null,
+    initialized: false,
 }
 
 
@@ -47,6 +51,17 @@ export const logout = createAsyncThunk(
     }
 )
 
+export const uploadAvatar = createAsyncThunk(
+    'auth/uploadAvatar',
+    async (file: File, { rejectWithValue }) => {
+      try {
+        return await uploadAvatarRequest(file)
+      } catch (error) {
+        return rejectWithValue(getApiErrorMessage(error, 'Could not upload photo'))
+      }
+    },
+  )
+
 const authSlice = createSlice({
     name:"auth",
     initialState,
@@ -59,11 +74,13 @@ const authSlice = createSlice({
         builder.addCase(fetchMe.fulfilled, (state, action) => {
             state.user = action.payload
             state.status = "success"
+            state.initialized = true
         })
         builder.addCase(fetchMe.rejected, (state) => {
             state.user = null
             state.error = null
             state.status = "idle"
+            state.initialized = true
         })
         builder.addCase(register.pending, (state) => {
             state.status = "loading"
@@ -100,6 +117,19 @@ const authSlice = createSlice({
         builder.addCase(logout.rejected, (state, action) => {
             state.user = null
             state.error = action.error.message ?? null
+            state.status = "error"
+        })
+        builder.addCase(uploadAvatar.pending, (state) => {
+            state.status = "loading"
+            state.error = null
+        })
+        builder.addCase(uploadAvatar.fulfilled, (state, action) => {
+            state.user = action.payload
+            state.status = "success"
+            state.error = null
+        })
+        builder.addCase(uploadAvatar.rejected, (state, action) => {
+            state.error = typeof action.payload === 'string' ? action.payload : 'Could not upload photo'
             state.status = "error"
         })
     }

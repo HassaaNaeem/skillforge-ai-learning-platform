@@ -13,6 +13,9 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(1),
   REDIS_URL: z.string().min(1),
   GEMINI_API_KEY: z.string().min(1),
+  CLOUDINARY_CLOUD_NAME: z.string().default(''),
+  CLOUDINARY_API_KEY: z.string().default(''),
+  CLOUDINARY_API_SECRET: z.string().default(''),
 });
 
 export const env = envSchema.parse(process.env);

@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import multer from 'multer';
 import { AppError } from '../utils/AppError.js';
 
 export function errorHandler(
@@ -10,7 +11,12 @@ export function errorHandler(
   const appError =
     error instanceof AppError
       ? error
-      : new AppError(500, error instanceof Error ? error.message : 'Internal server error');
+      : error instanceof multer.MulterError
+        ? new AppError(
+            400,
+            error.code === 'LIMIT_FILE_SIZE' ? 'Avatar must be under 2MB' : error.message,
+          )
+        : new AppError(500, error instanceof Error ? error.message : 'Internal server error');
 
   if (appError.statusCode >= 500) {
     console.error(error);
