@@ -47,7 +47,7 @@ export function ProfilePage() {
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
-              alt=""
+              alt={`${user.name}'s avatar`}
               className="h-16 w-16 rounded-full object-cover"
             />
           ) : (
@@ -65,6 +65,7 @@ export function ProfilePage() {
           ref={inputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
+          aria-label="Upload profile photo"
           className="sr-only"
           onChange={handleFile}
         />

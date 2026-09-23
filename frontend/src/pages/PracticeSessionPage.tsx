@@ -184,7 +184,14 @@ export function PracticeSessionPage() {
         <p className="text-sm text-[var(--muted)]">{progressLabel}</p>
       </header>
 
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--line)]">
+      <div
+        className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--line)]"
+        role="progressbar"
+        aria-valuenow={index + 1}
+        aria-valuemin={1}
+        aria-valuemax={questions.length}
+        aria-label={progressLabel}
+      >
         <div
           className="h-full rounded-full bg-[var(--accent)]"
           style={{ width: `${((index + 1) / questions.length) * 100}%` }}
@@ -224,7 +231,10 @@ export function PracticeSessionPage() {
         </label>
 
         {answered ? (
-          <div className="mt-4 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-4">
+          <div
+            className="mt-4 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-4"
+            aria-live="polite"
+          >
             {currentAnswer?.feedback ? (
               <>
                 <div className="flex flex-wrap items-center gap-2">

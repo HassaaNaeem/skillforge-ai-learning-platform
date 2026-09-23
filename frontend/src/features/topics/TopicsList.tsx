@@ -25,7 +25,14 @@ export function TopicsList() {
   const topics = data ?? [];
 
   if (topics.length === 0) {
-    return <p className="text-sm text-[var(--muted)]">No topics yet.</p>;
+    return (
+      <div className="rounded-[14px] border border-[var(--line)] bg-[var(--surface)] p-6">
+        <p className="text-sm font-medium text-[var(--fg)]">No tracks yet</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Seed the database from the backend, then refresh this page.
+        </p>
+      </div>
+    );
   }
 
   return (

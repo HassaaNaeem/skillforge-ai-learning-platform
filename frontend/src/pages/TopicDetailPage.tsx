@@ -110,6 +110,7 @@ export function TopicDetailPage() {
                 key={level}
                 type="button"
                 onClick={() => setDifficulty(level)}
+                aria-pressed={difficulty === level}
                 className={`rounded-[8px] px-3 py-1.5 text-xs font-medium capitalize ${
                   difficulty === level
                     ? 'bg-[var(--surface)] text-[var(--fg)] shadow-[var(--shadow)]'
@@ -157,7 +158,7 @@ export function TopicDetailPage() {
           <ol className="mt-3 space-y-2 text-sm text-[var(--muted)]">
             <li>1. Questions stay hidden until you start—no preview list.</li>
             <li>2. Write an interview-style answer, then submit.</li>
-            <li>3. Answers are stored now; AI scoring lands in a later milestone.</li>
+            <li>3. Stay on the question. Feedback, score, and pass/fail appear when the worker finishes.</li>
           </ol>
         </div>
       </section>

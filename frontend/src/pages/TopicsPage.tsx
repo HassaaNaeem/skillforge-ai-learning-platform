@@ -10,8 +10,8 @@ export function TopicsPage() {
       />
       <p className="mb-8 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
         You will not see the question list up front—that is the point. Treat it like a real screen:
-        read the prompt, write a complete answer, then move on. Scoring and AI feedback come later
-        in the product; today your answers are saved to the session.
+        read the prompt, write a complete answer, then submit. Gemini grades the attempt in the
+        background; signed-in history shows up on your dashboard.
       </p>
       <TopicsList />
     </div>

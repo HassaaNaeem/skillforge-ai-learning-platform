@@ -9,16 +9,8 @@ Light SaaS (Notion/Stripe-like): off-white canvas, ink text, one blue accent, 10
 - Tokens: [`src/index.css`](src/index.css)
 - Primitives: `Button`, `Input`, `PageHeader` in `src/components/ui/`
 - Marketing: [`MarketingLayout.tsx`](src/components/layout/MarketingLayout.tsx) for `/`
-- App: [`AppShell.tsx`](src/components/layout/AppShell.tsx) for `/login`, `/topics`, and future practice
-- Pages: `/` landing, `/login`, `/topics`
+- App: [`AppShell.tsx`](src/components/layout/AppShell.tsx) for topics, practice, dashboard, profile, auth
 
-New feature screens should reuse AppShell and primitives.
+## Routes
 
-## M14 polish (deferred)
-
-Do **not** redesign the brand or layout system later. M14 is for:
-
-- empty / loading / error consistency
-- mobile and accessibility pass
-- real product screenshots on the landing
-- spacing/typography refinement only
+`/`, `/topics`, `/topics/:id`, `/login`, `/register`, `/anonymous/sessions/:id`, `/practice/sessions/:id`, `/dashboard`, `/profile`.

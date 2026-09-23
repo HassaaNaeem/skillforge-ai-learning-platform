@@ -1,65 +1,76 @@
 # SkillForge
 
-AI-powered developer learning and interview platform. See [docs/SkillForge_Project_Spec.md](docs/SkillForge_Project_Spec.md) for the full product spec and [AGENTS.md](AGENTS.md) for how this project is built (as a hands-on learning environment, not just an AI-generated app).
+Interview practice for developers. Pick a track, write an open-ended answer, and get AI feedback without waiting on the HTTP request. Guests can try a session immediately; accounts keep history, a dashboard, and a profile photo.
 
-## Status
+## What it does
 
-**Milestone 0 — Architecture & tooling.** Scaffolding only: monorepo, TypeScript, linting/formatting, env config, health-check endpoints. No application features, no database, no Redis/AI/real-time yet.
+- **Practice tracks** — JavaScript, TypeScript, React, Node.js, PostgreSQL, Git. Questions stay hidden until you start.
+- **Guest or account** — Anonymous sessions live in Redis (45 minutes). Signed-in sessions live in Postgres.
+- **AI evaluation** — After submit, a BullMQ worker calls Gemini and writes `feedback`, `score`, and `isCorrect`.
+- **Live update** — The session page joins a Socket.io room. The worker publishes on Redis; the API emits to that room. No polling.
+- **Dashboard** — Session stats, score over time (Recharts), and a drag-to-reorder focus queue (DnD Kit).
+- **Profile photo** — Multer + Cloudinary; only the image URL is stored.
 
 ## Architecture
 
-Monorepo with three workspaces:
+npm workspaces: `frontend/`, `backend/`, `packages/shared/`.
 
-- `frontend/` — React + TypeScript + Vite + Tailwind CSS
-- `backend/` — Express + TypeScript, with two entrypoints sharing one codebase:
-  - `src/server.ts` — the API process (Express + Socket.io, added M8)
-  - `src/worker.ts` — the background-job process (BullMQ processors, added M6)
-- `packages/shared/` — Zod schemas + inferred TypeScript types shared between frontend and backend (populated starting M1/M2)
+| Process | Command | Role |
+|---|---|---|
+| Frontend | `npm run dev -w frontend` | Vite + React at http://localhost:5173 |
+| API | `npm run dev -w backend` | Express + Socket.io at http://localhost:4000 |
+| Worker | `npm run dev:worker -w backend` | BullMQ consumer (required for AI feedback) |
 
-External services: Neon (managed PostgreSQL via Prisma, from M1) and Redis (cache, rate limiting, BullMQ queue, pub/sub — from M2 onward).
+External services: **Neon** (Postgres via Prisma), **Redis** (cache, guest sessions, queue, pub/sub), **Gemini**, **Cloudinary**.
 
-## Running locally
+## Run locally
 
-```bash
-npm install          # installs all workspaces
-npm run dev          # runs frontend (http://localhost:5173) and backend (http://localhost:4000) together
-```
-
-Individual workspaces:
+You need Node 22+, Redis on `REDIS_URL`, and a Neon database.
 
 ```bash
-npm run dev -w frontend
-npm run dev -w backend        # API
-npm run dev:worker -w backend # worker placeholder
+npm install
 ```
 
-Other scripts (run from repo root, apply across all workspaces):
+Copy `backend/.env.example` to `backend/.env` and fill in the values. Copy `frontend/.env.example` to `frontend/.env` if you do not already have `VITE_API_URL`.
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
-npm run format         # prettier --write
-npm run format:check
+npm run dev                 # frontend + API
+npm run dev:worker -w backend
 ```
 
-Copy `.env.example` to `.env` in `backend/` (and `frontend/` if needed) before running.
+Apply migrations from `backend/` when the schema changes:
 
-## Milestone roadmap
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
 
-| # | Milestone | Type |
-|---|-----------|------|
-| M0 | Architecture + tooling | Mixed |
-| M1 | PostgreSQL + Prisma + Neon | Learning |
-| M2 | Auth + anonymous mode (Redis-backed sessions) | Mixed |
-| M3 | Core practice platform | Mixed |
-| M4 | Axios + Redux Toolkit + TanStack Query | Learning |
-| M5–M8 | Redis + background jobs (BullMQ) + AI integration + Socket.io (one combined real-time evaluation pipeline) | Learning |
-| M9 | Cloudinary + Multer (uploads) | Learning |
-| M10 | Dashboard + Recharts + DnD Kit | Mixed |
-| M11 | Testing (Vitest/Jest + RTL) | Learning |
-| M12 | Docker + Nginx | Learning |
-| M13 | GitHub Actions + CI/CD + deployment | Learning |
-| M14 | Final polish | Mixed |
+Other root scripts: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run format`.
 
-Target: 7–10 focused days, hard max ~14. See the M0 plan doc for the full day-by-day breakdown and scope cuts.
+## Environment
+
+**Backend** (`backend/.env`)
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` / `DIRECT_URL` | Neon pooled + migrate URLs |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Auth cookies |
+| `REDIS_URL` | Cache, guests, BullMQ, Socket.io bridge |
+| `GEMINI_API_KEY` | Answer evaluation |
+| `CLOUDINARY_*` | Avatar uploads (optional until you upload a photo) |
+
+**Frontend** (`frontend/.env`)
+
+| Variable | Purpose |
+|---|---|
+| `VITE_API_URL` | API origin, e.g. `http://localhost:4000` |
+
+## Product routes
+
+| Path | Who |
+|---|---|
+| `/` | Landing |
+| `/topics`, `/topics/:id` | Start a session (guest or signed in) |
+| `/anonymous/sessions/:id` | Guest practice |
+| `/practice/sessions/:id` | Account practice |
+| `/dashboard`, `/profile` | Signed-in only |

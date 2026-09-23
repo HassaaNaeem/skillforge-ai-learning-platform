@@ -99,15 +99,25 @@ export function FocusQueue({ topics }: { topics: DashboardTopic[] }) {
         ) : null}
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={items.map((topic) => topic.id)} strategy={verticalListSortingStrategy}>
-          <ol className="mt-4 space-y-2">
-            {items.map((topic, index) => (
-              <SortableTopic key={topic.id} topic={topic} index={index} />
-            ))}
-          </ol>
-        </SortableContext>
-      </DndContext>
+      {items.length ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={items.map((topic) => topic.id)} strategy={verticalListSortingStrategy}>
+            <ol className="mt-4 space-y-2">
+              {items.map((topic, index) => (
+                <SortableTopic key={topic.id} topic={topic} index={index} />
+              ))}
+            </ol>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <p className="mt-4 text-sm text-[var(--muted)]">
+          No tracks to queue yet.{' '}
+          <Link to="/topics" className="font-medium text-[var(--accent)]">
+            Browse topics
+          </Link>
+          .
+        </p>
+      )}
     </section>
   );
 }

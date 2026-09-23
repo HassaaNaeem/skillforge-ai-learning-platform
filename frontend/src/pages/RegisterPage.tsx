@@ -31,7 +31,7 @@ export function RegisterPage() {
     <div className="mx-auto max-w-md">
       <PageHeader
         title="Create an account"
-        description="Save practice history and pick up sessions later."
+        description="Keep practice history, open a score dashboard, and add a profile photo."
       />
 
       <form

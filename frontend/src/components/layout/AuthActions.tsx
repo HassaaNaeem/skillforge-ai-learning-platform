@@ -25,7 +25,7 @@ export function AuthActions({
           {user.avatarUrl ? (
             <img
               src={user.avatarUrl}
-              alt=""
+              alt={`${user.name}'s avatar`}
               className="h-8 w-8 rounded-full object-cover"
             />
           ) : (

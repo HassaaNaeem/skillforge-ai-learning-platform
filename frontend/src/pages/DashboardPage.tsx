@@ -73,7 +73,11 @@ export function DashboardPage() {
       <section className="mt-6 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow)]">
         <h2 className="text-lg font-semibold text-[var(--fg)]">Score over time</h2>
         {chart.length ? (
-          <div className="mt-4 h-64">
+          <div
+            className="mt-4 h-64"
+            role="img"
+            aria-label="Line chart of average score over time"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chart}>
                 <CartesianGrid stroke="#e4e7ec" vertical={false} />

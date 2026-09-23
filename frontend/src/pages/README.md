@@ -1,3 +1,3 @@
 # pages
 
-Route-level page components, wired up once React Router is introduced (M3/M4).
+Route-level screens: landing, auth, topics, practice sessions, dashboard, and profile.

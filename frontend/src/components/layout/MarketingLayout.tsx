@@ -4,6 +4,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { fetchMe } from '../../features/auth/authSlice';
 import { AuthActions } from './AuthActions';
 import { BrandMark } from './BrandMark';
+import { SkipLink } from './SkipLink';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm ${isActive ? 'font-medium text-[var(--fg)]' : 'text-[var(--muted)] hover:text-[var(--fg)]'}`;
@@ -17,21 +18,28 @@ export function MarketingLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--fg)]">
+      <SkipLink />
       <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[var(--surface)]/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 sm:gap-8">
             <BrandMark />
-            <nav className="hidden items-center gap-6 sm:flex" aria-label="Primary">
+            <nav className="flex items-center gap-4 sm:gap-6" aria-label="Primary">
               <NavLink to="/topics" className={navLinkClass}>
                 Topics
               </NavLink>
+              <a
+                href="/#how-it-works"
+                className="hidden text-sm text-[var(--muted)] hover:text-[var(--fg)] sm:inline"
+              >
+                How it works
+              </a>
             </nav>
           </div>
           <AuthActions />
         </div>
       </header>
 
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         <Outlet />
       </main>
 
@@ -52,8 +60,13 @@ export function MarketingLayout() {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/login" className="hover:text-[var(--fg)]">
-                  Practice sessions
+                <a href="/#how-it-works" className="hover:text-[var(--fg)]">
+                  How it works
+                </a>
+              </li>
+              <li>
+                <NavLink to="/dashboard" className="hover:text-[var(--fg)]">
+                  Dashboard
                 </NavLink>
               </li>
             </ul>
@@ -67,8 +80,13 @@ export function MarketingLayout() {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/topics" className="hover:text-[var(--fg)]">
-                  Browse topics
+                <NavLink to="/register" className="hover:text-[var(--fg)]">
+                  Create account
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/profile" className="hover:text-[var(--fg)]">
+                  Profile
                 </NavLink>
               </li>
             </ul>

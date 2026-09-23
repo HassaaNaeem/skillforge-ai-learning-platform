@@ -22,7 +22,6 @@ export const fetchMe = createAsyncThunk(
     'auth/me',
     async () => {
       const response = await api.get(`/auth/me`)
-      console.log(response.data.user)
       return response.data.user
     },
   )

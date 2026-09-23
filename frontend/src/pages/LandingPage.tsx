@@ -48,10 +48,19 @@ function ProductMock() {
           <div className="mt-5 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] px-3 py-3 text-sm text-[var(--muted)]">
             When two components share the same setup logic…
           </div>
-          <div className="mt-4 flex justify-end">
-            <span className="sf-btn-primary rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white">
-              Submit answer
-            </span>
+          <div className="mt-4 rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-medium text-[var(--fg)]">AI feedback</p>
+              <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent)]">
+                Score 82
+              </span>
+              <span className="rounded-full bg-[#ecfdf3] px-2 py-0.5 text-[11px] font-medium text-[#027a48]">
+                Pass
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">
+              Clear signal: extract when setup repeats. Mentioning stale closures would make this stronger.
+            </p>
           </div>
         </div>
       </div>
@@ -75,8 +84,8 @@ export function LandingPage() {
               give a hiring manager. Not flashcards. Not a leaderboard of trivia.
             </p>
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
-              Guests can run a full session in the browser. Create an account when you want history
-              across days.
+              Guests can run a full session and get AI feedback in the browser. Create an account
+              when you want a dashboard and history across days.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink to="/topics">Browse topics</ButtonLink>
@@ -111,8 +120,8 @@ export function LandingPage() {
           Built for how developers actually prepare
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-          Most “interview apps” show you the answer key. SkillForge hides the list, asks you to
-          write, and stores the attempt. That is closer to a real loop: think, explain, review later.
+          Most interview apps show you the answer key. SkillForge hides the list, asks you to write,
+          then a worker grades the attempt. That is closer to a real loop: think, explain, review.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
@@ -125,8 +134,8 @@ export function LandingPage() {
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
             <p className="text-sm font-semibold text-[var(--fg)]">Written answers</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              You type like you are pairing. We save the text now. Structured AI scoring is a later
-              milestone—your practice still counts today.
+              You type like you are pairing. Submit, then stay on the question while Gemini writes
+              feedback, a score, and a pass/fail.
             </p>
           </article>
           <article className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
@@ -139,7 +148,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="border-y border-[var(--line)] bg-[var(--surface)]">
+      <section
+        id="how-it-works"
+        className="scroll-mt-20 border-y border-[var(--line)] bg-[var(--surface)]"
+      >
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="text-2xl font-semibold tracking-tight text-[var(--fg)]">How it works</h2>
           <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
@@ -159,15 +171,15 @@ export function LandingPage() {
               <p className="mt-2 font-semibold text-[var(--fg)]">Write your answer</p>
               <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
                 One question at a time. Explain tradeoffs the way you would on a call, then submit
-                and move on.
+                and wait for score and feedback.
               </p>
             </li>
             <li className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] p-5">
               <p className="text-xs font-semibold text-[var(--accent)]">03</p>
               <p className="mt-2 font-semibold text-[var(--fg)]">Keep the session</p>
               <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-                Guests keep the tab. Accounts can refresh the URL. Feedback and dashboards come
-                next on the roadmap.
+                Guests keep the tab. Accounts can refresh the URL, open a dashboard of scores, and
+                set a profile photo.
               </p>
             </li>
           </ol>

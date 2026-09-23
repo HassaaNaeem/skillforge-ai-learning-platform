@@ -30,7 +30,7 @@ export function LoginPage() {
     <div className="mx-auto max-w-md">
       <PageHeader
         title="Sign in"
-        description="Signed-in sessions are stored in your account so you can refresh a practice URL and come back later. Guests can still start a track without this step."
+        description="Signed-in sessions stay in your account, with a dashboard of scores. Guests can still start a track without this step."
       />
 
       <form
