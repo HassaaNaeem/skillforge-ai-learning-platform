@@ -10,6 +10,7 @@ import topicsRoutes from './modules/topics/routes.js';
 import questionsRoutes from './modules/questions/routes.js';
 import practiceRoutes from './modules/practice/routes.js';
 import usersRoutes from './modules/users/routes.js';
+import dashboardRoutes from './modules/dashboard/routes.js';
 import { attachSockets } from './sockets/index.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/topics', topicsRoutes);
 app.use('/questions', questionsRoutes);
 app.use('/practice', practiceRoutes);
 app.use('/users', usersRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 app.use(errorHandler);
 

@@ -27,9 +27,14 @@ export function AppShell() {
                 Topics
               </NavLink>
               {user ? (
-                <NavLink to="/profile" className={navLinkClass}>
-                  Profile
-                </NavLink>
+                <>
+                  <NavLink to="/dashboard" className={navLinkClass}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/profile" className={navLinkClass}>
+                    Profile
+                  </NavLink>
+                </>
               ) : null}
             </nav>
           </div>
